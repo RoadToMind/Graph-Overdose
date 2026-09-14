@@ -6,10 +6,10 @@ description: >-
   A paper-to-code implementation of the Articulated-Body Dynamics Network,
   extended from reinforcement learning to diffusion-policy imitation learning.
 
-url: "https://YOUR-USERNAME.github.io"
-baseurl: "/YOUR-PAGES-REPOSITORY"
+url: "https://roadtomind.github.io"
+baseurl: "/Graph-Overdose"
 
-project_repository_url: "https://github.com/YOUR-USERNAME/YOUR-PAGES-REPOSITORY"
+project_repository_url: "https://github.com/RoadToMind/Graph-Overdose"
 source_repository_url: "https://github.com/RoadToMind/Graph-Link"
 abd_paper_url: "https://arxiv.org/abs/2603.19078"
 abd_paper_pdf_url: "https://arxiv.org/pdf/2603.19078"
