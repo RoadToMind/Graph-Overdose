@@ -1,0 +1,9 @@
+---
+layout: default
+title: "Graph-Link Presentation Script"
+description: >-
+  Seven-minute presentation script for the Graph-Link ABD-Net project.
+permalink: /presentation/
+---
+<section class="hero"><div class="container container-narrow"><a class="back-link" href="{{ '/' | relative_url }}">← Return to project page</a><div class="publication-header"><h1 class="publication-title">Graph-Link Presentation Script</h1><p class="publication-subtitle">From the ABD-Net paper to diffusion-policy imitation learning</p><div class="publication-venue">Approximately seven minutes</div></div></div></section>
+<section class="section section-soft"><div class="container container-narrow"><p class="section-subtitle">Open each section while presenting. “Show” identifies the corresponding visual; the remaining text is the spoken narration.</p><div class="script-list">{% assign steps = "Hook|The paper’s central idea|Turning the paper into code|PPO validation|Imitation-learning extension|Evaluation protocol|Results|Takeaway" | split: "|" %}{% assign times = "0:00–0:35|0:35–1:25|1:25–2:25|2:25–3:15|3:15–4:20|4:20–5:05|5:05–6:20|6:20–7:00" | split: "|" %}{% for step in steps %}<details class="script-step" {% if forloop.first %}open{% endif %}><summary><span class="script-time">{{ times[forloop.index0] }}</span>{{ step }}</summary><div class="script-content"><div class="show-cue"><strong>Show:</strong> The corresponding project visual, architecture diagram, implementation, or results table.</div><p class="script-copy">This section explains how Graph-Link moves from the ABD-Net dynamics-grounded prior through graph construction, PPO validation, diffusion-policy conditioning, evaluation, and the limitations that motivate the next experiment.</p></div></details>{% endfor %}</div></div></section>

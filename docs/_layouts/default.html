@@ -2,64 +2,32 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     {% assign page_title = page.title | default: site.title %}
     {% assign page_description = page.description | default: site.description %}
-
-    <title>
-      {{ page_title }}
-      {% unless page_title == site.title %} · {{ site.short_title }}{% endunless %}
-    </title>
-
+    <title>{{ page_title }}{% unless page_title == site.title %} · {{ site.title }}{% endunless %}</title>
     <meta name="description" content="{{ page_description | strip_html | escape }}">
-    <meta name="theme-color" content="#07111f">
-    <meta name="color-scheme" content="dark">
-
+    <meta name="theme-color" content="#ffffff">
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ page_title | escape }}">
-    <meta
-      property="og:description"
-      content="{{ page_description | strip_html | escape }}"
-    >
-    <meta
-      property="og:url"
-      content="{{ page.url | absolute_url }}"
-    >
-
-    <link
-      rel="canonical"
-      href="{{ page.url | absolute_url }}"
-    >
-
-    <link
-      rel="stylesheet"
-      href="{{ '/assets/css/style.css' | relative_url }}"
-    >
-
-    <script
-      src="{{ '/assets/js/main.js' | relative_url }}"
-      defer
-    ></script>
+    <meta property="og:description" content="{{ page_description | strip_html | escape }}">
+    <meta property="og:url" content="{{ page.url | absolute_url }}">
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+    <link rel="icon" type="image/svg+xml" href="{{ '/assets/images/favicon.svg' | relative_url }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
   </head>
-
-  <body class="{{ page.body_class | default: 'standard-page' }}">
-    <div id="scroll-progress" aria-hidden="true"></div>
-
-    <a class="skip-link" href="#main-content">
-      Skip to content
-    </a>
-
-    {% include navigation.html %}
-
-    <main id="main-content">
-      {{ content }}
-    </main>
-
-    {% include footer.html %}
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <main id="main-content">{{ content }}</main>
+    <footer class="footer">
+      <div class="container container-narrow">
+        <p>This website follows the academic project-page style popularized by <a href="https://nerfies.github.io/" target="_blank" rel="noopener noreferrer">Nerfies</a>.</p>
+        <p>ABD-Net implementation and experiments: <a href="{{ site.source_repository_url }}" target="_blank" rel="noopener noreferrer">Graph-Link</a>.</p>
+      </div>
+    </footer>
   </body>
 </html>

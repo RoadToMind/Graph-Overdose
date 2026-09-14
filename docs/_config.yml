@@ -1,5 +1,7 @@
-title: "ABD-Net: From Paper to Imitation Learning"
-short_title: "ABD-Net"
+title: "Graph-Link"
+paper_title: >-
+  Graph-Link: Extending Articulated-Body Dynamics Networks
+  to Diffusion-Policy Imitation Learning
 description: >-
   A paper-to-code implementation of the Articulated-Body Dynamics Network,
   extended from reinforcement learning to diffusion-policy imitation learning.
@@ -7,12 +9,22 @@ description: >-
 url: "https://YOUR-USERNAME.github.io"
 baseurl: "/YOUR-PAGES-REPOSITORY"
 
-repository_url: "https://github.com/YOUR-USERNAME/YOUR-PAGES-REPOSITORY"
+project_repository_url: "https://github.com/YOUR-USERNAME/YOUR-PAGES-REPOSITORY"
 source_repository_url: "https://github.com/RoadToMind/Graph-Link"
-paper_url: "https://arxiv.org/abs/2603.19078"
+abd_paper_url: "https://arxiv.org/abs/2603.19078"
+abd_paper_pdf_url: "https://arxiv.org/pdf/2603.19078"
+diffusion_paper_url: "https://arxiv.org/abs/2303.04137"
 
-author:
-  name: "Your Name"
+venue: "Independent Research Project · 2026"
+
+authors:
+  - name: "Fawad Hussain"
+    url: ""
+    affiliation: 1
+
+affiliations:
+  - id: 1
+    name: "Your University or Research Group"
 
 markdown: kramdown
 permalink: pretty
