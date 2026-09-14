@@ -1,0 +1,35 @@
+---
+layout: default
+title: "Page not found"
+permalink: /404.html
+---
+
+<section class="hero">
+  <div class="reading-shell">
+    <p class="eyebrow">404</p>
+
+    <h1>
+      This link reached
+      <span class="gradient-text">a missing node.</span>
+    </h1>
+
+    <p class="lead">
+      The requested page is not part of this project’s current graph.
+    </p>
+
+    <div class="hero-actions">
+      <a class="button" href="{{ '/' | relative_url }}">
+        Return home
+      </a>
+
+      <a
+        class="button button-secondary"
+        href="{{ site.repository_url }}/issues"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Report a broken link
+      </a>
+    </div>
+  </div>
+</section>

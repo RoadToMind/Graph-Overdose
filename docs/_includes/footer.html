@@ -1,0 +1,47 @@
+<footer class="site-footer">
+  <div class="footer-shell">
+    <div>
+      <a class="brand footer-brand" href="{{ '/' | relative_url }}">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>ABD<span class="brand-accent">Net</span></span>
+      </a>
+
+      <p>
+        From a dynamics-grounded research idea to a working
+        imitation-learning extension.
+      </p>
+    </div>
+
+    <div class="footer-links">
+      <a
+        href="{{ site.paper_url }}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Original paper
+      </a>
+
+      <a
+        href="{{ site.source_repository_url }}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Source code
+      </a>
+
+      <a href="{{ '/presentation/' | relative_url }}">
+        Showcase script
+      </a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>
+      © {{ site.time | date: "%Y" }} {{ site.author.name }}
+    </span>
+
+    <span>
+      Built with Jekyll and GitHub Pages
+    </span>
+  </div>
+</footer>

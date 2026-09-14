@@ -1,0 +1,26 @@
+title: "ABD-Net: From Paper to Imitation Learning"
+short_title: "ABD-Net"
+description: >-
+  A paper-to-code implementation of the Articulated-Body Dynamics Network,
+  extended from reinforcement learning to diffusion-policy imitation learning.
+
+url: "https://YOUR-USERNAME.github.io"
+baseurl: "/YOUR-PAGES-REPOSITORY"
+
+repository_url: "https://github.com/YOUR-USERNAME/YOUR-PAGES-REPOSITORY"
+source_repository_url: "https://github.com/RoadToMind/Graph-Link"
+paper_url: "https://arxiv.org/abs/2603.19078"
+
+author:
+  name: "Your Name"
+
+markdown: kramdown
+permalink: pretty
+
+sass:
+  style: compressed
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md

@@ -1,0 +1,42 @@
+<header class="site-header">
+  <div class="nav-shell">
+    <a
+      class="brand"
+      href="{{ '/' | relative_url }}"
+      aria-label="{{ site.short_title }} home"
+    >
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>ABD<span class="brand-accent">Net</span></span>
+    </a>
+
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-navigation"
+      aria-label="Open navigation"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav id="site-navigation" class="site-navigation" aria-label="Main navigation">
+      <a href="{{ '/' | relative_url }}#journey">Journey</a>
+      <a href="{{ '/' | relative_url }}#architecture">Architecture</a>
+      <a href="{{ '/' | relative_url }}#imitation">Imitation learning</a>
+      <a href="{{ '/' | relative_url }}#results">Results</a>
+      <a href="{{ '/presentation/' | relative_url }}">Presentation</a>
+
+      <a
+        class="nav-external"
+        href="{{ site.source_repository_url }}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GitHub
+        <span aria-hidden="true">↗</span>
+      </a>
+    </nav>
+  </div>
+</header>
