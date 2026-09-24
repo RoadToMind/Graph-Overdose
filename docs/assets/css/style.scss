@@ -100,9 +100,15 @@ video {
 
 #main-content > ul,
 #main-content > ol {
-  padding-left: 0;
+  padding-left: 1.5rem;
   text-align: left;
   list-style-position: outside;
+}
+
+#main-content > .implementation-heading {
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  font-size: clamp(1.55rem, 3vw, 2rem);
 }
 
 #main-content > img {

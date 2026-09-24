@@ -143,7 +143,7 @@ Among the ABD-based approaches, using the root representation provided the most 
 
 GraphOnly is particularly useful because it forces the policy to rely much more strongly on information derived from the graph, allowing us to examine how plausible and informative the learned graph representation is by itself.
 
-## Franka Graph Implementation
+<h2 class="implementation-heading">Franka Graph Implementation</h2>
 
 Before presenting the results, one important implementation detail concerns the Franka robot used in all three environments.
 
