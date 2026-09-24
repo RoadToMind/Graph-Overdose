@@ -50,6 +50,11 @@ ABD-Net imposes a meaningful direction of information flow through bottom-up, ph
 
 ![ABD-Net pipeline]({{ '/assets/images/abdnet-pipeline.svg' | relative_url }})
 
+<h3>Observation Encoding</h3>
+<p>
+For each link, it transforms it into an observation embedding.
+</p>
+
 ### Dynamics-Informed Message Passing
 
 Each link first constructs a dynamics-aware representation using its local observation embedding, its learned inertia-like base feature $B$, and the messages received from its descendants.
@@ -59,6 +64,13 @@ Before this representation is passed to its parent, the components associated wi
 ### Action Decoding
 
 Each joint action is predicted from its parent link representation. The parent representation is useful because it has already incorporated the filtered contribution of the child and its subtree, giving the decoder a more complete representation of the dynamics surrounding that joint [3](#ref-3).
+
+<h3>The Added Loss</h3>
+<p>
+The orthogonality loss encourages the parameter (W) for each link to behave like
+a proper motion basis, so the approximation used in the message-passing equation
+remains reasonable.
+</p>
 
 ### PPO
 
