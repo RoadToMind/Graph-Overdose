@@ -48,7 +48,15 @@ This is where the main paper, **ABD-Net** [3](#ref-3), comes into play. It asks 
 
 ABD-Net imposes a meaningful direction of information flow through bottom-up, physics-inspired propagation, together with learnable parameters analogous to inertia-like information and permitted motion directions.
 
-![ABD-Net pipeline]({{ '/assets/images/abdnet-pipeline.svg' | relative_url }})
+<figure class="wide-figure">
+	<img
+		src="{{ '/assets/images/abdnet-figure2.png' | relative_url }}"
+		alt="Figure 2 from the ABD-Net paper showing observation encoding, dynamics-informed message passing, and action decoding"
+	/>
+	<figcaption>
+		Figure 2 from Shin et al. [3]: Overview of ABD-NET on a quadruped robot.
+	</figcaption>
+</figure>
 
 ABD-Net consists of the following main components:
 
