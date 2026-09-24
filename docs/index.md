@@ -146,7 +146,8 @@ GraphOnly also requires information about the task object. To provide this, a "d
 This is sufficient for an initial implementation because each node encoder already receives information derived from the overall observation, although the relation between the robot and object is clearly not equivalent to a normal robot joint.
 
 
-<section id="part-i-results" class="paper-section paper-section-muted">
+<a id="part-i-results"></a>
+
 ## Results
 
 Both AllComb and GraphOnly generally take longer before meaningful performance begins to emerge.
@@ -158,7 +159,6 @@ In such a setting, detailed information about the robot's full connectivity may 
 A more informative setting could instead contain a wider range of starting configurations or constrain the available space around the robot so that completing the task requires more difficult and varied poses.
 
 Such changes, however, would also require a new dataset containing demonstrations that cover these configurations.
-</section>
 
 ## Conclusion and Future Work
 

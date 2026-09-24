@@ -60,6 +60,56 @@ video {
   max-width: var(--reading-width);
 }
 
+/* Markdown article body */
+
+#main-content {
+  text-align: center;
+}
+
+#main-content > h2,
+#main-content > h3,
+#main-content > h4,
+#main-content > p,
+#main-content > ul,
+#main-content > ol,
+#main-content > blockquote {
+  width: min(calc(100% - 2rem), var(--reading-width));
+  margin-right: auto;
+  margin-left: auto;
+}
+
+#main-content > h2 {
+  margin-top: 4rem;
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.2;
+  text-align: center;
+}
+
+#main-content > h3 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.8rem;
+  text-align: center;
+}
+
+#main-content > p {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+#main-content > ul,
+#main-content > ol {
+  padding-left: 0;
+  text-align: center;
+  list-style-position: inside;
+}
+
+#main-content > img {
+  width: min(calc(100% - 2rem), 900px);
+  margin: 2rem auto;
+}
+
 /* Accessibility */
 
 .skip-link {
