@@ -134,10 +134,12 @@ I therefore tested several variations, ranging from concatenating only the root-
 
 Among the ABD-based approaches, using the root representation provided the most practical trade-off. Since the propagation is bottom-up, information from the descendants eventually reaches the root. However, compressing everything into only the root representation also means that a considerable amount of link-specific information may be lost.
 
-The experiments were selected using two criteria:
+<p><strong>The experiments were selected using two criteria:</strong></p>
 
-- Pre-existing demonstrations had to be available in ManiSkill.
-- The task had to involve either meaningful dynamics or robot configurations where information about the robot's articulated pose could potentially be beneficial.
+<ul>
+	<li>Pre-existing demonstrations had to be available in ManiSkill.</li>
+	<li>The task had to involve either meaningful dynamics or robot configurations where information about the robot's articulated pose could potentially be beneficial.</li>
+</ul>
 
 GraphOnly is particularly useful because it forces the policy to rely much more strongly on information derived from the graph, allowing us to examine how plausible and informative the learned graph representation is by itself.
 
