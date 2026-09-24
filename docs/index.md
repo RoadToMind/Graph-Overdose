@@ -1,121 +1,241 @@
 ---
 layout: default
 title: "ABD-Net: From Reinforcement Learning to Imitation Learning"
-description: "An independent implementation and evaluation of the Articulated-Body Dynamics Network."
+description: "An independent implementation and extension of the Articulated-Body Dynamics Network from reinforcement learning to imitation learning."
 ---
 
-<div class="project-page">
-  <header class="publication-hero">
-    <div class="page-container hero-content">
-      <p class="eyebrow">Independent Implementation and Extension</p>
-      <h1>ABD-Net: From Reinforcement Learning <span class="title-break">to Imitation Learning</span></h1>
-      <p class="hero-summary">Reconstructing a dynamics-grounded robot policy from its paper, validating it with PPO, and extending its embodiment-aware representation to Diffusion Policy.</p>
-      <p class="authors"><a href="https://github.com/RoadToMind">Fawad Hussain</a></p>
-      <nav class="publication-links" aria-label="Project links">
-        <a class="publication-button" href="https://arxiv.org/abs/2603.19078" target="_blank" rel="noopener noreferrer">Main Paper</a>
-        <a class="publication-button" href="https://github.com/RoadToMind/Graph-Overdose" target="_blank" rel="noopener noreferrer">Code</a>
-        <a class="publication-button" href="#results-il">Results</a>
-        <a class="publication-button" href="#references">References</a>
-      </nav>
-    </div>
-  </header>
+# ABD-Net: From Reinforcement Learning to Imitation Learning
+**Independent Implementation and Extension**
 
-  <section id="introduction" class="paper-section">
-    <div class="page-container">
-      <div class="section-heading"><span class="section-number">01</span><h2>Introduction</h2><p>Why neural networks, robot structure, and dynamics belong together.</p></div>
-      <div class="prose">
-        <h3>Deep neural networks in robot learning</h3>
-        <p>Deep neural networks learn layered representations by composing nonlinear transformations. Early layers can identify relatively local patterns, while later layers combine them into task-relevant representations. This ability has made deep networks useful for perception, prediction, planning, and control <a class="citation" href="#ref-1">[1]</a>.</p>
-        <p>In robot learning, a neural network can parameterize a policy <span class="inline-equation">π<sub>θ</sub>(a | s)</span> that maps the robot state to an action. It can also represent a value function, dynamics model, visual encoder, or action-sequence generator. The principal advantage is that nonlinear control rules can be learned directly from interaction or demonstrations. The disadvantage is that an unconstrained network must often rediscover physical relationships that are already known from the robot's construction.</p>
-        <div class="research-question"><span>Central question</span><p>Can the articulated structure of a robot be built into the network so that the policy does not have to learn that structure from scratch?</p></div>
-        <h3>The main paper: ABD-Net</h3>
-        <p>Shin et al. introduce the <em>Articulated-Body Dynamics Network</em>, or ABD-Net <a class="citation" href="#ref-3">[3]</a>. The architecture is inspired by the Articulated Body Algorithm: information is encoded independently for each robot link and then propagated from child links toward their parents. Physical quantities are replaced by learnable neural representations.</p>
-        <p>The paper evaluates ABD-Net as a reinforcement-learning actor on simulated hopper, quadruped, and humanoid systems, as well as through sim-to-real locomotion experiments. This project begins by independently reconstructing that actor and then asks whether the same structural prior remains useful when the learning objective changes from reward maximization to imitation.</p>
-      </div>
-    </div>
-  </section>
+Reconstructing a dynamics-grounded robot policy from its paper, evaluating it with PPO, and exploring whether its structural prior can be transferred to imitation learning and manipulation.
 
-  <section id="part-one" class="part-banner"><div class="page-container"><span>Part I</span><h2>Reproducing ABD-Net with Reinforcement Learning</h2><p>From the paper's equations to a working graph-based PPO actor.</p></div></section>
-  <section id="paper-method" class="paper-section">
-    <div class="page-container">
-      <div class="section-heading"><span class="section-number">02</span><h2>Methodology</h2><p>The main components of the paper and their implementation.</p></div>
-      <figure class="wide-figure"><img src="{{ '/assets/images/abdnet-pipeline.svg' | relative_url }}" alt="ABD-Net pipeline from link encoding through graph propagation to joint actions"><figcaption>The ABD-Net actor encodes each link, aggregates information from leaves to the root, and decodes joint-level actions.</figcaption></figure>
-      <div class="method-grid">
-        <article class="method-card"><span class="method-symbol">Φ</span><h3>Link encoder</h3><p>Each link observation is independently mapped into a learned latent representation. This preserves the robot's link-level organization.</p></article>
-        <article class="method-card"><span class="method-symbol">M</span><h3>Dynamics propagation</h3><p>Messages travel from children to parents following the kinematic tree, approximating the direction of articulated inertia propagation.</p></article>
-        <article class="method-card"><span class="method-symbol">Ψ</span><h3>Action decoder</h3><p>A joint action is decoded from the representation of its associated parent link while maintaining the simulator's actuator ordering.</p></article>
-        <article class="method-card"><span class="method-symbol">L<sub>orth</sub></span><h3>Orthogonality objective</h3><p>An auxiliary loss discourages collapsed or redundant transformation directions inside the learned propagation mechanism.</p></article>
-      </div>
-      <div class="prose"><h3>Training with PPO</h3><p>The reconstructed actor is optimized with Proximal Policy Optimization <a class="citation" href="#ref-2">[2]</a>. PPO alternates between collecting interaction trajectories and performing several minibatch updates using a clipped surrogate objective. The critic remains a conventional multilayer perceptron, allowing the experiment to isolate the architectural change in the actor.</p></div>
-    </div>
-  </section>
+**Fawad Hussain**
 
-  <section id="implementation-decisions" class="paper-section paper-section-muted">
-    <div class="page-container">
-      <div class="section-heading"><span class="section-number">03</span><h2>Independent Implementation</h2><p>Where engineering decisions could diverge from the source work.</p></div>
-      <div class="prose"><p>At the time this implementation began, no public reference implementation was available. The architecture therefore had to be reconstructed from the paper's equations, algorithm description, and reported experimental setup. The following choices should be treated as implementation decisions rather than claims about the authors' private code.</p></div>
-      <div class="decision-table-wrapper"><table class="decision-table"><thead><tr><th>Area</th><th>Paper-level specification</th><th>This implementation</th><th>Possible consequence</th></tr></thead><tbody>
-        <tr><td>Robot graph</td><td>Articulated links connected as a tree</td><td>Graph extracted from the SAPIEN articulation with directed child-to-parent edges</td><td>Depends on simulator link and joint conventions</td></tr>
-        <tr><td>Action mapping</td><td>Joint-level action decoding</td><td>Simulator actuator order is preserved explicitly</td><td>Assumes one controlled joint per non-root link</td></tr>
-        <tr><td>Propagation</td><td>Bottom-up articulated message passing</td><td>Batched graph operations implemented with DGL</td><td>Numerically equivalent structure may use different batching</td></tr>
-        <tr><td>Projection</td><td>Learned transformation from the paper's propagation equation</td><td>A bounded softplus-based projection is used for numerical stability</td><td>Prevents amplification but differs from the literal equation</td></tr>
-        <tr><td>Initialization</td><td>Not fully specified</td><td>Identity-like transformation matrices and zero-initialized residual terms</td><td>Changes early optimization behavior</td></tr>
-        <tr><td>Value function</td><td>Actor–critic training</td><td>Separate MLP critic</td><td>Structural bias is applied only to the policy actor</td></tr>
-      </tbody></table></div>
-    </div>
-  </section>
+[Main Paper]({{ site.abd_paper_url }}) · [Implementation]({{ site.source_repository_url }}) · [Project Repository]({{ site.project_repository_url }})
 
-  <section id="results-rl" class="paper-section"><div class="page-container"><div class="section-heading"><span class="section-number">04</span><h2>Part I Results</h2><p>Validation of the independently reconstructed PPO actor.</p></div><div class="two-column-layout"><div class="prose"><h3>What was validated</h3><p>The reconstructed actor can be trained end to end in the ManiSkill locomotion environments. Gradients propagate through the graph encoder and bottom-up message-passing stages, models can be checkpointed and restored, and deterministic evaluation produces articulated control behavior.</p><div class="result-callout"><strong>Interpretation</strong><p>This is evidence that the paper's architecture can be independently converted into an executable policy. It should not be presented as a complete numerical reproduction until identical environments, budgets, baselines, and multiple random seeds are evaluated.</p></div></div><figure class="video-figure"><video controls muted loop playsinline preload="metadata"><source src="{{ '/assets/videos/abdnet-ppo-demo.mp4' | relative_url }}" type="video/mp4">Your browser does not support HTML video.</video><figcaption>Representative PPO rollout using the independently implemented ABD-Net actor.</figcaption></figure></div><div class="discussion-box"><h3>Discussion</h3><p>The PPO experiments establish functional correctness but do not, on their own, demonstrate the sample-efficiency and robustness gains reported in the source paper. A stronger reproduction would compare ABD-Net against an MLP, graph network, and embodiment-aware transformer under identical training budgets and at least three seeds.</p></div></div></section>
+---
 
-  <section id="part-two" class="part-banner part-banner-secondary"><div class="page-container"><span>Part II</span><h2>From Reinforcement Learning to Imitation Learning</h2><p>Reusing the structural encoder inside an action-diffusion policy.</p></div></section>
-  <section id="rl-to-il" class="paper-section"><div class="page-container"><div class="section-heading"><span class="section-number">05</span><h2>Why the Transition Is Natural</h2><p>The embodiment prior is separate from the source of supervision.</p></div><div class="prose"><p>Reinforcement learning and imitation learning differ mainly in how the policy receives its training signal. PPO learns from interaction and rewards, whereas behavioral cloning and Diffusion Policy learn from demonstrated state–action sequences. Both still require a useful representation of the robot state before producing an action.</p><div class="learning-comparison" aria-label="Comparison of RL and IL"><article><span class="comparison-label">Reinforcement learning</span><code>state → ABD encoder → policy → action → reward</code></article><div class="shared-encoder"><span>Shared component</span><strong>Embodiment-aware ABD representation</strong></div><article><span class="comparison-label">Imitation learning</span><code>state → ABD encoder → diffusion model → action sequence</code></article></div><p>This transition is an architectural inference rather than a claim made directly by the ABD-Net paper: its structural prior is located in the state encoder, not in PPO itself. Body Transformer provides related evidence that embodiment-aware architectures can represent both reinforcement-learning and imitation-learning policies <a class="citation" href="#ref-4">[4]</a>.</p><p>Diffusion Policy supplies the imitation-learning component <a class="citation" href="#ref-5">[5]</a>. It predicts action sequences through conditional denoising and is especially useful for multimodal behavior and receding-horizon control. The ABD encoder replaces neither the diffusion objective nor the original observation; it augments the policy with a representation derived from the robot's articulated structure.</p></div></div></section>
+# 1. Introduction
 
-  <section id="il-experiments" class="paper-section paper-section-muted">
-    <div class="page-container">
-      <div class="section-heading"><span class="section-number">06</span><h2>Imitation-Learning Experiments</h2><p>What each experiment changes and why it is necessary.</p></div>
-      <div class="prose">
-        <p>The imitation-learning evaluation covers three manipulation environments: RollBall-v1, PushT-v1, and LiftPegUpright-v1. Together, they test rolling contact, precise planar pushing, and three-dimensional object reorientation.</p>
-        <p>For each environment, the main comparison is between the original state-conditioned Diffusion Policy and a policy augmented with ABD features. Additional experiments test whether the policy should receive the original state together with the graph representation or rely on the graph representation alone.</p>
-      </div>
-      <div class="environment-grid">
-        <article class="environment-card"><span class="environment-number">Environment 01</span><h3>RollBall-v1</h3><p>The Panda arm must push and roll a ball into a goal region at the opposite side of the table.</p><dl><div><dt>Trajectories</dt><dd>813</dd></div><div><dt>Transitions</dt><dd>37,851</dd></div><div><dt>Episode horizon</dt><dd>80 steps</dd></div></dl><strong>What this tests</strong><p>Long-horizon contact control, directional pushing, and whether the policy can maintain success after the ball reaches the goal.</p></article>
-        <article class="environment-card"><span class="environment-number">Environment 02</span><h3>PushT-v1</h3><p>The robot must precisely push a T-shaped object into a matching target region and move its end-effector into the terminal end-zone.</p><dl><div><dt>Trajectories</dt><dd>756</dd></div><div><dt>Transitions</dt><dd>72,873</dd></div><div><dt>Evaluation horizon</dt><dd>150 steps</dd></div></dl><strong>What this tests</strong><p>Precise planar manipulation, contact sequencing, object orientation, and sensitivity to small action errors.</p></article>
-        <article class="environment-card"><span class="environment-number">Environment 03</span><h3>LiftPegUpright-v1</h3><p>The robot must manipulate a peg lying on the table until the peg reaches a valid upright orientation.</p><dl><div><dt>Trajectories</dt><dd>880</dd></div><div><dt>Transitions</dt><dd>35,818</dd></div><div><dt>Evaluation horizon</dt><dd>100 steps</dd></div></dl><strong>What this tests</strong><p>Grasping, lifting, three-dimensional reorientation, and maintaining a stable final configuration.</p></article>
-      </div>
-      <p class="environment-source">Task descriptions follow the <a href="https://maniskill.readthedocs.io/en/latest/tasks/table_top_gripper/" target="_blank" rel="noopener noreferrer">ManiSkill task documentation</a>.</p>
-      <div class="experiment-grid">
-        <article class="experiment-card"><span class="experiment-id">E0</span><h3>Diffusion Policy baseline</h3><p>Uses the original state representation without ABD features.</p><strong>Purpose:</strong><p>Establish whether structural conditioning improves on the unmodified imitation-learning policy.</p></article>
-        <article class="experiment-card"><span class="experiment-id">E1</span><h3>Root-conditioned ABD</h3><p>Concatenates the final root representation with the original state. Action horizons 8, 12, and 15 are tested.</p><strong>Purpose:</strong><p>Test whether one compact, globally aggregated structural feature is sufficient.</p></article>
-        <article class="experiment-card"><span class="experiment-id">E2</span><h3>All-node ABD</h3><p>Conditions the diffusion model on representations from all eight Panda arm nodes.</p><strong>Purpose:</strong><p>Determine whether preserving link-specific information is better than using only the root.</p></article>
-        <article class="experiment-card"><span class="experiment-id">E3</span><h3>Representation-size ablation</h3><p>Compares 32 features per node, 256 features per node, and a 2,048-to-256 learned projection.</p><strong>Purpose:</strong><p>Separate the value of robot structure from the effect of simply supplying more features.</p></article>
-      </div>
-    </div>
-  </section>
+GNNs (Graph Neural Networks) use the same deep learning techniques, but apply them to graph-structured data [[1]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-1), [[2]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-2). Using graphs as the main structure, one can still arrive at many popular architectures, such as convolutional and attentional architectures. This is not to say that there are no differences; one of the main properties required is the use of permutation-invariant functions for learning representations of unordered sets [[1]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-1).
 
-  <section id="results-il" class="paper-section">
-    <div class="page-container">
-      <div class="section-heading"><span class="section-number">07</span><h2>Part II Results</h2><p>Root-conditioned and all-node ABD representations across three manipulation environments.</p></div>
-      <div class="evaluation-video-grid">
-        <figure class="video-figure"><video controls muted loop playsinline preload="metadata"><source src="{{ '/assets/videos/rollball-abd.mp4' | relative_url }}" type="video/mp4"></video><figcaption>ABD-conditioned Diffusion Policy on RollBall-v1.</figcaption></figure>
-        <figure class="video-figure"><video controls muted loop playsinline preload="metadata"><source src="{{ '/assets/videos/pusht-abd.mp4' | relative_url }}" type="video/mp4"></video><figcaption>ABD-conditioned Diffusion Policy on PushT-v1.</figcaption></figure>
-        <figure class="video-figure"><video controls muted loop playsinline preload="metadata"><source src="{{ '/assets/videos/liftpeg-abd.mp4' | relative_url }}" type="video/mp4"></video><figcaption>ABD-conditioned Diffusion Policy on LiftPegUpright-v1.</figcaption></figure>
-      </div>
-      <h3 class="results-heading">Results across environments</h3>
-      <div class="decision-table-wrapper"><table class="decision-table results-table"><thead><tr><th>Environment</th><th>Policy</th><th>Best success once</th><th>Final success once</th><th>Best success at end</th></tr></thead><tbody>
-        <tr><td rowspan="2">RollBall-v1</td><td>Diffusion Policy</td><td>55%</td><td class="best-result">55%</td><td class="best-result">2%</td></tr><tr><td>ABD + Diffusion Policy</td><td class="best-result">59%</td><td>54%</td><td>1%</td></tr>
-        <tr><td rowspan="2">PushT-v1</td><td>Diffusion Policy</td><td class="best-result">31%</td><td class="best-result">23%</td><td class="best-result">15%</td></tr><tr><td>ABD + Diffusion Policy</td><td>20%</td><td>19%</td><td>4%</td></tr>
-        <tr><td rowspan="2">LiftPegUpright-v1</td><td>Diffusion Policy</td><td class="best-result">50%</td><td>40%</td><td class="best-result">13%</td></tr><tr><td>ABD + Diffusion Policy</td><td>42%</td><td class="best-result">42%</td><td>8%</td></tr>
-      </tbody></table></div>
-      <p class="table-note">The table reports action-horizon-15, seed-1 experiments. “Best” is the maximum value observed over evaluation checkpoints, while “final” is the result at 100,000 training iterations.</p>
-      <h3 class="results-heading">Root-conditioned comparison</h3>
-      <div class="decision-table-wrapper"><table class="decision-table results-table"><thead><tr><th>Policy</th><th>Action horizon</th><th>Best success once</th><th>Final success once</th><th>Best success at end</th></tr></thead><tbody><tr><td>Diffusion Policy</td><td>8</td><td>47%</td><td>39%</td><td>1%</td></tr><tr><td>ABD + Diffusion Policy</td><td>8</td><td>47%</td><td>33%</td><td>1%</td></tr><tr><td>Diffusion Policy</td><td>12</td><td class="best-result">64%</td><td>44%</td><td>1%</td></tr><tr><td>ABD + Diffusion Policy</td><td>12</td><td>60%</td><td class="best-result">59%</td><td>1%</td></tr><tr><td>Diffusion Policy</td><td>15</td><td>55%</td><td class="best-result">55%</td><td class="best-result">2%</td></tr><tr><td>ABD + Diffusion Policy</td><td>15</td><td class="best-result">59%</td><td>54%</td><td>1%</td></tr></tbody></table></div>
-      <h3 class="results-heading">All-node representation ablation</h3>
-      <div class="decision-table-wrapper"><table class="decision-table results-table"><thead><tr><th>Representation</th><th>Total ABD dimensions</th><th>Best success once</th><th>Final success once</th><th>Best success at end</th></tr></thead><tbody><tr><td>Direct, 32 per link</td><td>256</td><td>46%</td><td class="best-result">43%</td><td>2%</td></tr><tr><td>Projected, 256 per link</td><td>2,048 → 256</td><td class="best-result">48%</td><td>34%</td><td>1%</td></tr><tr><td>Direct, 256 per link</td><td>2,048</td><td>37%</td><td>31%</td><td class="best-result">4%</td></tr></tbody></table></div>
-      <p class="table-note">“Success once” records whether success occurs at any point in an episode. “Success at end” requires the success condition to remain true at the final timestep. All reported experiments use seed 1.</p>
-      <div class="discussion-box"><h3>Discussion</h3><ul><li>At horizon 8, ABD and the baseline reach the same peak success, but the baseline finishes with a higher success-once rate.</li><li>At horizon 12, the baseline reaches the highest peak, while ABD finishes more consistently: 59% compared with 44%.</li><li>At horizon 15, ABD improves peak success from 55% to 59%, although their final results are similar.</li><li>Increasing the representation to 2,048 uncompressed features does not improve performance. The result suggests that structured and compact conditioning matters more than feature count alone.</li><li>Success-at-end remains between 1% and 4%. The policies can achieve the task condition transiently but rarely maintain it.</li></ul><p>These results support a limited conclusion: ABD features are competitive and sometimes beneficial, but they do not consistently outperform the baseline. Because only one seed was evaluated, the differences should be treated as exploratory rather than statistically conclusive.</p><p>Sequential imitation learning also faces distribution shift because policy actions influence the observations encountered later in the episode <a class="citation" href="#ref-6">[6]</a>. This may help explain why transient success does not translate into stable completion.</p></div>
-    </div>
-  </section>
+Graph neural networks can be used in many areas, such as scene representation, molecules/materials, social networks, and robot kinematics and dynamics, which will be discussed further here.
 
-  <section id="conclusion" class="paper-section paper-section-muted"><div class="page-container"><div class="section-heading"><span class="section-number">08</span><h2>Conclusion and Future Work</h2></div><div class="prose"><p>This project independently reconstructs the structural core of ABD-Net and demonstrates that it can operate as a PPO actor. It then separates the learned body representation from the reinforcement-learning objective and integrates that representation into Diffusion Policy.</p><p>The imitation-learning experiments show that the ABD representation is competitive with the baseline and can improve particular horizons or checkpoints. They also show that larger representations are not automatically better and that task completion remains unstable.</p><h3>Future work</h3><ol class="future-work-list"><li>Repeat every comparison over at least three to five random seeds and report confidence intervals.</li><li>Match parameter counts and computational cost across ABD and baseline policies.</li><li>Evaluate additional manipulation environments and different robot embodiments.</li><li>Ablate the orthogonality loss, bounded projection, root-only conditioning, and all-node conditioning.</li><li>Improve stable task completion through longer observation histories, recovery demonstrations, or explicit terminal-state conditioning.</li><li>Extend the graph to model the gripper and multi-DoF joints without relying on the current one-joint-per-link assumption.</li></ol></div></div></section>
-  <section id="references" class="paper-section references-section"><div class="page-container"><div class="section-heading"><span class="section-number">09</span><h2>References</h2></div><ol class="reference-list"><li id="ref-1">Y. LeCun, Y. Bengio, and G. Hinton. “Deep Learning.” <em>Nature</em>, 2015. <a href="https://www.nature.com/articles/nature14539" target="_blank" rel="noopener noreferrer">Paper</a></li><li id="ref-2">J. Schulman et al. “Proximal Policy Optimization Algorithms.” 2017. <a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noopener noreferrer">Paper</a></li><li id="ref-3">S. Shin, K. Ren, X. Xiong, and J. P. Hanna. “Articulated-Body Dynamics Network: Dynamics-Grounded Prior for Robot Learning.” 2026. <a href="https://arxiv.org/abs/2603.19078" target="_blank" rel="noopener noreferrer">Paper</a></li><li id="ref-4">C. Sferrazza et al. “Body Transformer: Leveraging Robot Embodiment for Policy Learning.” <em>Conference on Robot Learning</em>, 2025. <a href="https://proceedings.mlr.press/v270/sferrazza25a.html" target="_blank" rel="noopener noreferrer">Paper</a></li><li id="ref-5">C. Chi et al. “Diffusion Policy: Visuomotor Policy Learning via Action Diffusion.” <em>Robotics: Science and Systems</em>, 2023. <a href="https://roboticsproceedings.org/rss19/p026.html" target="_blank" rel="noopener noreferrer">Paper</a></li><li id="ref-6">S. Ross, G. Gordon, and D. Bagnell. “A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning.” <em>AISTATS</em>, 2011. <a href="https://proceedings.mlr.press/v15/ross11a.html" target="_blank" rel="noopener noreferrer">Paper</a></li></ol></div></section>
-</div>
+In robotics, GNNs can be used to build the main structural outline of a robot, including its joints, links, and the type of information that can be transmitted through the graph. A graph consists of nodes and edges: the objects being represented and the connections through which information flows between them.
+
+The deep learning component depends on what exactly we are trying to learn. There are node-level tasks, which predict properties of individual nodes; edge-level tasks, which reason about connections between nodes; and graph-level tasks, which predict properties of the graph as a whole. GNNs therefore commonly follow a graph-in, graph-out architecture, where node, edge, and global embeddings are progressively transformed while preserving the connectivity of the graph [[1]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-1).
+
+This is particularly useful in robotics because a normal MLP largely treats the robot state as one flat vector. A robot, however, is not naturally a flat vector. It is an articulated structure consisting of links, joints, parent-child relationships, forces, and motion propagating throughout the system.
+
+One class of GNNs is the message-passing GNN, where each node looks at its neighbors, combines the information it receives from them, and uses that information to update its own representation. Repeating this process allows information to travel through the entire structure [[1]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-1), [[2]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-2).
+
+## The main paper: ABD-Net
+
+Existing robotic GNN policies already exploit kinematic structures such as link connectivity, providing a framework that can represent the structure of different robots. However, kinematic connectivity alone does not describe how the robot actually behaves dynamically. The propagation of forces and motion through the robot was still relatively underexplored.
+
+This is where the main paper, **ABD-Net** [[3]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-3), comes into play. It asks whether introducing a forward-dynamics-inspired structure into the policy could act as an inductive bias and help the policy learn more effectively.
+
+ABD-Net imposes a meaningful direction of information flow through bottom-up, physics-inspired propagation, together with learnable parameters analogous to inertia-like information and permitted motion directions.
+
+![ABD-Net pipeline]({{ '/assets/images/abdnet-pipeline.svg' | relative_url }})
+
+ABD-Net consists of the following main components:
+
+### 1. Observation Encoding
+
+For each link, the corresponding observation is transformed into an observation embedding.
+
+### 2. Dynamics-Informed Message Passing
+
+Each link first constructs a dynamics-aware representation using its local observation embedding, its learned inertia-like base feature $B$, and the messages received from its descendants.
+
+Before this representation is passed to its parent, the components associated with the learned motion basis $W$ are attenuated. The parent then aggregates the incoming contributions to form its own link representation [[3]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-3).
+
+### 3. Action Decoding
+
+Each joint action is predicted from its parent link representation. The parent representation is useful because it has already incorporated the filtered contribution of the child and its subtree, giving the decoder a more complete representation of the dynamics surrounding that joint [[3]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-3).
+
+### 4. The Added Loss
+
+The orthogonality loss encourages the parameter $W$ for each link to behave like a proper motion basis, helping the approximation used in the message-passing equation remain reasonable [[3]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-3).
+
+### 5. PPO
+
+PPO is the reinforcement-learning algorithm used to learn the policy [[4]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-4), while ABD-Net serves as the architecture embedded inside that policy.
+
+---
+
+# 2. Independent Implementation
+
+Since no official implementation of ABD-Net was available, the method had to be reconstructed directly from the paper.
+
+In my implementation, I tried to stay as close as possible to the described method but had to resolve several ambiguities in the implementation details.
+
+The orthogonality loss was computed separately for each sample and then averaged, rather than first averaging the representations, since these two operations are not equivalent.
+
+The projection term used in the child-to-parent message was bounded to the range [0, 1] to prevent unstable amplification during message propagation, since the orthogonality constraint is only enforced as a soft objective during training.
+
+Small differences in PPO, such as minibatch size, learning rate, value-loss coefficient, and entropy coefficient, can also cause noticeable differences in performance.
+
+There will therefore inevitably be some discrepancies between the implementation described in the paper and this reproduction, but it can still provide insight into how such an implementation behaves, what it is actually learning, and how effective it is.
+
+---
+
+# 3. Part I - Reinforcement Learning Evaluation
+
+For the experiments, I used SAPIEN [[5]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-5), ManiSkill3 [[6]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-6), and its PPO training setup, following the general setup used in the original paper.
+
+The implementation was similarly evaluated on tasks such as the humanoid and hopper environments [[3]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-3).
+
+## Results
+
+## Rollout
+
+## Discussion
+
+A useful inductive bias does not necessarily increase the expressive power of the policy. Instead, it restricts or structures the search space so that the policy is encouraged, in this case, toward more physically meaningful representations.
+
+An interesting aspect, also explored in the original paper, is that the SAPIEN experiments use ManiSkill's default reward functions without the additional gait-related terms used in some of the Genesis locomotion environments [[3]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-3).
+
+Under the limited tasks and seeds I tested, the structural prior did not produce a clear gain in either sample efficiency or final return, while introducing additional computational overhead.
+
+It should also be noted that this implementation did not use the JAX implementation used for some of the experiments in the original work.
+
+---
+
+# 4. Part II - From Reinforcement Learning to Imitation Learning
+
+This raises a broader question: **what happens when the idea is taken beyond the source paper, particularly toward imitation learning (IL), and how far does the usefulness of the dynamics-grounded representation extend?**
+
+This direction connects to previous work that bridges learned expert policies with imitation learning or incorporates graph- and kinematics-based structural priors into imitation-learning policies [[7]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-7)-[[9]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-9).
+
+Tasks such as picking, pulling, and manipulation more generally could potentially benefit from such a physics-inspired prior. Manipulation itself is also mentioned as one of the future directions in the original ABD-Net paper [[3]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-3).
+
+## Transferring ABD-Net to Diffusion Policy
+
+Still using ManiSkill as the backbone, I used its existing Diffusion Policy implementation for the imitation-learning experiments.
+
+Diffusion Policy formulates robot action generation as a conditional denoising diffusion process and has shown strong performance across a range of manipulation tasks [[10]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-10).
+
+Transferring the ABD-Net framework into an IL setting required several components of the original formulation to be replaced.
+
+In my implementation, I removed the original action decoder and PPO component and instead concatenated the learned ABD representation with the pre-existing observation, which then becomes part of the condition supplied to the U-Net in the Diffusion Policy.
+
+One difficulty with this approach is that an embedding exists for every link, and given the size of each embedding, concatenating all of them does not scale particularly well.
+
+I therefore tested several variations, ranging from concatenating only the root-node representation to using representations from all nodes with different embedding sizes.
+
+Among the ABD-based approaches, using the root representation provided the most practical trade-off. Since the propagation is bottom-up, information from the descendants eventually reaches the root. However, compressing everything into only the root representation also means that a considerable amount of link-specific information may be lost.
+
+---
+
+# 5. Imitation-Learning Experiments
+
+For selecting the experiments, two criteria were used:
+
+1. Pre-existing demonstrations had to be available in ManiSkill.
+2. The task had to involve either meaningful dynamics or robot configurations where information about the robot's articulated pose could potentially be beneficial.
+
+Based on these criteria, three experiments were chosen:
+
+- **RollBall-v1**
+- **PushT**
+- **LiftPegUpright**
+
+Three policy variants were compared:
+
+| Policy | Description |
+| --- | --- |
+| **NormalDiff** | Standard Diffusion Policy using the original observation. |
+| **AllComb** | ABD features are concatenated with the original observation. |
+| **GraphOnly** | The graph representation provides the main structural conditioning. |
+
+GraphOnly is particularly useful because it forces the policy to rely much more strongly on information derived from the graph, allowing us to examine how plausible and informative the learned graph representation is by itself.
+
+---
+
+# 6. Franka Graph Implementation
+
+Before presenting the results, one important implementation detail concerns the Franka robot used in all three environments.
+
+After modifying the encoder for the imitation-learning setting, where PPO was no longer involved, the original Franka graph did not include the gripper links.
+
+This occurred because the grippers are connected through fixed links, while the graph constructed up to that point only contained dynamic links.
+
+This can be addressed by backtracking each dynamic link to its nearest dynamic parent and connecting the corresponding nodes with an edge.
+
+For **AllComb**, I kept the graph without the additional gripper links because the original observation already contained this information.
+
+For **GraphOnly**, however, these links were incorporated so that the graph itself retained more of the robot's structure.
+
+GraphOnly also requires information about the task object. To provide this, a "dummy" object node was introduced and connected directly to the root node.
+
+This is sufficient for an initial implementation because each node encoder already receives information derived from the overall observation, although the relation between the robot and object is clearly not equivalent to a normal robot joint.
+
+---
+
+# 7. Part II Results
+
+The results show that the best-performing policy overall is **NormalDiff**, followed by **AllComb** and then **GraphOnly**.
+
+Some of the runs also do not appear to have fully converged, which should be considered when interpreting the comparison.
+
+Both AllComb and GraphOnly generally take longer before meaningful performance begins to emerge.
+
+## Evaluation
+
+One possible reason for this underperformance is the limited multimodality of the dataset.
+
+Even in a task with more noticeable dynamics, such as RollBall, the additional structural information may not be necessary if the policy only needs to push the ball and the initial robot configuration remains similar across demonstrations.
+
+In such a setting, detailed information about the robot's full connectivity may provide little additional benefit.
+
+A more informative setting could instead contain a wider range of starting configurations or constrain the available space around the robot so that completing the task requires more difficult and varied poses.
+
+Such changes, however, would also require a new dataset containing demonstrations that cover these configurations.
+
+---
+
+# 8. Conclusion and Future Work
+
+In conclusion, ABD-Net is a constructive push in the right direction, as having a dynamics-informed structure as a prior can be valuable in many tasks.
+
+Although there was not much benefit observed in the experiments conducted here, this is still a relatively small evaluation, and there are several design choices that could be changed to better make use of its potential.
+
+The experiments did not show a consistent performance advantage from transferring the ABD-Net prior directly to manipulation, but further design choices could still be explored, together with better-targeted experiments, to improve approaches such as GraphOnly.
+
+For example, the connection between the object node and the root is currently treated in the same way as the other connections in the graph, even though this is not really the same type of relationship as a joint between two robot links.
+
+There are several graph formulations that could explore this distinction more explicitly.
+
+Another direction would be to avoid adding the object directly to the robot graph and instead use a **scene graph**, where the robot exists as one structured component and the object as another, with a separate relation describing how the two interact.
+
+Recent work has similarly explored scene graphs as explicit structured representations for robotic imitation learning [[11]](https://chatgpt.com/c/6ab3a92a-fbc4-83eb-93d6-d8501df4106d?add_source=github_connector#ref-11).
+
+This could provide a better way of combining the dynamics-informed representation of the robot with the additional relationships required for manipulation.
+
+---
+
+# References
+
+**[1]** B. Sanchez-Lengeling, E. Reif, A. Pearce, and A. B. Wiltschko, "A Gentle Introduction to Graph Neural Networks," *Distill*, 2021, doi: 10.23915/distill.00033.
+
+**[2]** M. M. Bronstein, J. Bruna, T. Cohen, and P. Veličković, "Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges," arXiv:2104.13478, 2021.
+
+**[3]** S. Shin, K. Ren, X. Xiong, and J. P. Hanna, "Articulated-Body Dynamics Network: Dynamics-Grounded Prior for Robot Learning," arXiv:2603.19078, 2026.
+
+**[4]** J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. Klimov, "Proximal Policy Optimization Algorithms," arXiv:1707.06347, 2017.
+
+**[5]** F. Xiang *et al*., "SAPIEN: A SimulAted Part-Based Interactive ENvironment," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, 2020, pp. 11097-11107.
+
+**[6]** S. Tao *et al*., "ManiSkill3: GPU Parallelized Robotics Simulation and Rendering for Generalizable Embodied AI," in *Robotics: Science and Systems (RSS)*, 2025.
+
+**[7]** H. Geng, Z. Li, Y. Geng, J. Chen, H. Dong, and H. Wang, "PartManip: Learning Cross-Category Generalizable Part Manipulation Policy From Point Cloud Observations," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, 2023, pp. 2978-2988.
+
+**[8]** V. Vosylius and E. Johns, "Instant Policy: In-Context Imitation Learning via Graph Diffusion," in *International Conference on Learning Representations (ICLR)*, 2025.
+
+**[9]** Q. Lv, H. Li, X. Deng, R. Shao, Y. Li, J. Hao, L. Gao, M. Y. Wang, and L. Nie, "Spatial-Temporal Graph Diffusion Policy with Kinematic Modeling for Bimanual Robotic Manipulation," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, 2025, pp. 17394-17404.
+
+**[10]** C. Chi, Z. Xu, S. Feng, E. Cousineau, Y. Du, B. Burchfiel, R. Tedrake, and S. Song, "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion," in *Robotics: Science and Systems (RSS)*, 2023.
+
+**[11]** J. Qian, Q. Peng, E. Panov, L. Fermoselle, D. Jayaraman, B. Bucher, and T. Kelestemur, "Expanding Spatial and Temporal Context for Robotic Imitation Learning With Scene Graphs," arXiv:2606.01072, 2026.
