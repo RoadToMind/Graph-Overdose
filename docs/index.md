@@ -136,6 +136,7 @@ Transferring the ABD-Net framework into an IL setting required several component
 
 <!-- RL-to-IL / ABD-Net + Diffusion Policy architecture figure goes here -->
 
+There are many possible ways of doing this.
 In my implementation, I removed the original action decoder and PPO component and instead concatenated the learned ABD representation with the pre-existing observation, which then becomes part of the condition supplied to the U-Net in the Diffusion Policy.
 
 One difficulty with this approach is that an embedding exists for every link, and given the size of each embedding, concatenating all of them does not scale particularly well.
