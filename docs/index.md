@@ -50,9 +50,11 @@ ABD-Net imposes a meaningful direction of information flow through bottom-up, ph
 
 ![ABD-Net pipeline]({{ '/assets/images/abdnet-pipeline.svg' | relative_url }})
 
+ABD-Net consists of the following main components:
+
 <h3>Observation Encoding</h3>
 <p>
-For each link, it transforms it into an observation embedding.
+For each link, the corresponding observation is transformed into an observation embedding.
 </p>
 
 ### Dynamics-Informed Message Passing
@@ -68,8 +70,8 @@ Each joint action is predicted from its parent link representation. The parent r
 <h3>The Added Loss</h3>
 <p>
 The orthogonality loss encourages the parameter (W) for each link to behave like
-a proper motion basis, so the approximation used in the message-passing equation
-remains reasonable.
+a proper motion basis, helping the approximation used in the message-passing equation
+remain reasonable <a href="#ref-3">[3]</a>.
 </p>
 
 ### PPO
@@ -93,9 +95,15 @@ There will therefore inevitably be some discrepancies between the implementation
 
 ## Part I: Reinforcement Learning Evaluation
 
+### Evaluation
+
 For the experiments, I used SAPIEN [5](#ref-5), ManiSkill3 [6](#ref-6), and its PPO training setup, following the general setup used in the original paper.
 
 The implementation was similarly evaluated on tasks such as the humanoid and hopper environments [3](#ref-3).
+
+<!-- Part I result graphs go here -->
+
+<!-- Humanoid/Hopper video showcases go here -->
 
 ### What the experiments showed
 
@@ -126,6 +134,8 @@ Diffusion Policy formulates robot action generation as a conditional denoising d
 
 Transferring the ABD-Net framework into an IL setting required several components of the original formulation to be replaced.
 
+<!-- RL-to-IL / ABD-Net + Diffusion Policy architecture figure goes here -->
+
 In my implementation, I removed the original action decoder and PPO component and instead concatenated the learned ABD representation with the pre-existing observation, which then becomes part of the condition supplied to the U-Net in the Diffusion Policy.
 
 One difficulty with this approach is that an embedding exists for every link, and given the size of each embedding, concatenating all of them does not scale particularly well.
@@ -134,6 +144,8 @@ I therefore tested several variations, ranging from concatenating only the root-
 
 Among the ABD-based approaches, using the root representation provided the most practical trade-off. Since the propagation is bottom-up, information from the descendants eventually reaches the root. However, compressing everything into only the root representation also means that a considerable amount of link-specific information may be lost.
 
+<!-- Root-only vs all-node / embedding-size experiment graph goes here -->
+
 <p><strong>The experiments were selected using two criteria:</strong></p>
 
 <ul>
@@ -141,7 +153,27 @@ Among the ABD-based approaches, using the root representation provided the most 
 	<li>The task had to involve either meaningful dynamics or robot configurations where information about the robot's articulated pose could potentially be beneficial.</li>
 </ul>
 
-GraphOnly is particularly useful because it forces the policy to rely much more strongly on information derived from the graph, allowing us to examine how plausible and informative the learned graph representation is by itself.
+<p>Based on these criteria, three experiments were chosen:</p>
+
+<ol>
+	<li>RollBall-v1</li>
+	<li>PushT</li>
+	<li>LiftPegUpright</li>
+</ol>
+
+<p>
+These three experiments are compared using the normal Diffusion Policy
+(<strong>NormalDiff</strong>), the policy where ABD features are concatenated
+with the original observation (<strong>AllComb</strong>), and the policy where
+the graph representation provides the main structural conditioning
+(<strong>GraphOnly</strong>).
+</p>
+
+<p>
+GraphOnly is particularly useful because it forces the policy to rely much more
+strongly on information derived from the graph, allowing us to examine how
+plausible and informative the learned graph representation is by itself.
+</p>
 
 <h2 class="implementation-heading">Franka Graph Implementation</h2>
 
@@ -163,6 +195,12 @@ This is sufficient for an initial implementation because each node encoder alrea
 <a id="part-i-results"></a>
 
 ## Results
+
+<!-- NormalDiff / AllComb / GraphOnly comparison graphs go here -->
+
+### Evaluation
+
+The results show that the best-performing policy overall is NormalDiff, followed by AllComb and then GraphOnly. Some of the runs also do not appear to have fully converged, which should be considered when interpreting the comparison.
 
 Both AllComb and GraphOnly generally take longer before meaningful performance begins to emerge.
 
@@ -198,17 +236,17 @@ This could provide a better way of combining the dynamics-informed representatio
 <h2>References</h2>
 
 <ol class="reference-list">
-<li id="ref-1">B. Sanchez-Lengeling, E. Reif, A. Pearce, and A. B. Wiltschko, <em>A Gentle Introduction to Graph Neural Networks</em>, Distill, 2021. <a href="https://distill.pub/2021/gnn-intro/" target="_blank" rel="noopener noreferrer">Paper</a></li>
-<li id="ref-2">M. M. Bronstein, J. Bruna, T. Cohen, and P. Veličković, <em>Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges</em>, 2021. <a href="https://arxiv.org/abs/2104.13478" target="_blank" rel="noopener noreferrer">Paper</a></li>
-<li id="ref-3">S. Shin, K. Ren, X. Xiong, and J. P. Hanna, <em>Articulated-Body Dynamics Network: Dynamics-Grounded Prior for Robot Learning</em>, 2026. <a href="{{ site.abd_paper_url }}" target="_blank" rel="noopener noreferrer">Paper</a></li>
-<li id="ref-4">J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. Klimov, <em>Proximal Policy Optimization Algorithms</em>, 2017. <a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noopener noreferrer">Paper</a></li>
-<li id="ref-5">F. Xiang et al., <em>SAPIEN: A SimulAted Part-Based Interactive ENvironment</em>, CVPR, 2020.</li>
-<li id="ref-6">S. Tao et al., <em>ManiSkill3: GPU Parallelized Robotics Simulation and Rendering for Generalizable Embodied AI</em>, RSS, 2025.</li>
-<li id="ref-7">H. Geng et al., <em>PartManip: Learning Cross-Category Generalizable Part Manipulation Policy From Point Cloud Observations</em>, CVPR, 2023.</li>
-<li id="ref-8">V. Vosylius and E. Johns, <em>Instant Policy: In-Context Imitation Learning via Graph Diffusion</em>, ICLR, 2025.</li>
-<li id="ref-9">Q. Lv et al., <em>Spatial-Temporal Graph Diffusion Policy with Kinematic Modeling for Bimanual Robotic Manipulation</em>, CVPR, 2025.</li>
-<li id="ref-10">C. Chi et al., <em>Diffusion Policy: Visuomotor Policy Learning via Action Diffusion</em>, RSS, 2023. <a href="https://roboticsproceedings.org/rss19/p026.html" target="_blank" rel="noopener noreferrer">Paper</a></li>
-<li id="ref-11">J. Qian et al., <em>Expanding Spatial and Temporal Context for Robotic Imitation Learning With Scene Graphs</em>, 2026.</li>
+<li id="ref-1">B. Sanchez-Lengeling, E. Reif, A. Pearce, and A. B. Wiltschko, <em>A Gentle Introduction to Graph Neural Networks</em>, Distill, 2021, doi: 10.23915/distill.00033. <a href="https://distill.pub/2021/gnn-intro/" target="_blank" rel="noopener noreferrer">Paper</a></li>
+<li id="ref-2">M. M. Bronstein, J. Bruna, T. Cohen, and P. Veličković, <em>Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges</em>, arXiv:2104.13478, 2021. <a href="https://arxiv.org/abs/2104.13478" target="_blank" rel="noopener noreferrer">Paper</a></li>
+<li id="ref-3">S. Shin, K. Ren, X. Xiong, and J. P. Hanna, <em>Articulated-Body Dynamics Network: Dynamics-Grounded Prior for Robot Learning</em>, arXiv:2603.19078, 2026. <a href="{{ site.abd_paper_url }}" target="_blank" rel="noopener noreferrer">Paper</a></li>
+<li id="ref-4">J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. Klimov, <em>Proximal Policy Optimization Algorithms</em>, arXiv:1707.06347, 2017. <a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noopener noreferrer">Paper</a></li>
+<li id="ref-5">F. Xiang <em>et al.</em>, <em>SAPIEN: A SimulAted Part-Based Interactive ENvironment</em>, in <em>Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)</em>, 2020, pp. 11097–11107.</li>
+<li id="ref-6">S. Tao <em>et al.</em>, <em>ManiSkill3: GPU Parallelized Robotics Simulation and Rendering for Generalizable Embodied AI</em>, in <em>Robotics: Science and Systems (RSS)</em>, 2025.</li>
+<li id="ref-7">H. Geng, Z. Li, Y. Geng, J. Chen, H. Dong, and H. Wang, <em>PartManip: Learning Cross-Category Generalizable Part Manipulation Policy From Point Cloud Observations</em>, in <em>Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)</em>, 2023, pp. 2978–2988.</li>
+<li id="ref-8">V. Vosylius and E. Johns, <em>Instant Policy: In-Context Imitation Learning via Graph Diffusion</em>, in <em>International Conference on Learning Representations (ICLR)</em>, 2025.</li>
+<li id="ref-9">Q. Lv, H. Li, X. Deng, R. Shao, Y. Li, J. Hao, L. Gao, M. Y. Wang, and L. Nie, <em>Spatial-Temporal Graph Diffusion Policy with Kinematic Modeling for Bimanual Robotic Manipulation</em>, in <em>Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)</em>, 2025, pp. 17394–17404.</li>
+<li id="ref-10">C. Chi, Z. Xu, S. Feng, E. Cousineau, Y. Du, B. Burchfiel, R. Tedrake, and S. Song, <em>Diffusion Policy: Visuomotor Policy Learning via Action Diffusion</em>, in <em>Robotics: Science and Systems (RSS)</em>, 2023. <a href="https://roboticsproceedings.org/rss19/p026.html" target="_blank" rel="noopener noreferrer">Paper</a></li>
+<li id="ref-11">J. Qian, Q. Peng, E. Panov, L. Fermoselle, D. Jayaraman, B. Bucher, and T. Kelestemur, <em>Expanding Spatial and Temporal Context for Robotic Imitation Learning With Scene Graphs</em>, arXiv:2606.01072, 2026.</li>
 </ol>
 </div>
 </section>
