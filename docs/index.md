@@ -111,7 +111,38 @@ The implementation was similarly evaluated on tasks such as the humanoid and hop
 
 <!-- Part I result graphs go here -->
 
-<!-- Humanoid/Hopper video showcases go here -->
+<h3>Humanoid Walk Policy Comparison</h3>
+
+<p>
+Seed 2 policies evaluated at the same checkpoint:
+<strong>75.52 million environment steps</strong>.
+</p>
+
+<div class="experiment-grid">
+	<figure class="video-figure">
+		<video controls muted loop playsinline preload="metadata">
+			<source
+				src="{{ '/assets/videos/256abd.mp4' | relative_url }}"
+				type="video/mp4"
+			/>
+		</video>
+		<figcaption>
+			ABD-Net — Seed 2 — Evaluation return: 969.85
+		</figcaption>
+	</figure>
+
+	<figure class="video-figure">
+		<video controls muted loop playsinline preload="metadata">
+			<source
+				src="{{ '/assets/videos/256.mp4' | relative_url }}"
+				type="video/mp4"
+			/>
+		</video>
+		<figcaption>
+			MLP — Seed 2 — Evaluation return: 952.00
+		</figcaption>
+	</figure>
+</div>
 
 ### What the experiments showed
 
