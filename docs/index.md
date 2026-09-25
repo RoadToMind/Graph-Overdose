@@ -113,16 +113,11 @@ The implementation was similarly evaluated on tasks such as the humanoid and hop
 
 <h3>Humanoid Walk Policy Comparison</h3>
 
-<p>
-Seed 2 policies evaluated at the same checkpoint:
-<strong>75.52 million environment steps</strong>.
-</p>
-
 <div class="experiment-grid">
 	<figure class="video-figure">
 		<video controls muted loop playsinline preload="metadata">
 			<source
-				src="{{ '/assets/videos/256abd.mp4' | relative_url }}"
+				src="{{ '/assets/videos/236abd.mp4' | relative_url }}"
 				type="video/mp4"
 			/>
 		</video>
@@ -134,7 +129,7 @@ Seed 2 policies evaluated at the same checkpoint:
 	<figure class="video-figure">
 		<video controls muted loop playsinline preload="metadata">
 			<source
-				src="{{ '/assets/videos/256.mp4' | relative_url }}"
+				src="{{ '/assets/videos/236.mp4' | relative_url }}"
 				type="video/mp4"
 			/>
 		</video>
