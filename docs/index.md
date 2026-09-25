@@ -109,7 +109,30 @@ For the experiments, I used SAPIEN [5](#ref-5), ManiSkill3 [6](#ref-6), and its 
 
 The implementation was similarly evaluated on tasks such as the humanoid and hopper environments [3](#ref-3).
 
-<!-- Part I result graphs go here -->
+<h3>Humanoid Walk Learning Curves</h3>
+
+<div class="experiment-grid">
+	<figure class="wide-figure">
+		<img
+			src="{{ '/assets/images/figure3-humanoid-walk-paper.svg' | relative_url }}"
+			alt="Humanoid Walk learning curves from Figure 3 of the original ABD-Net paper"
+		/>
+		<figcaption>
+			Original paper — Humanoid Walk. Adapted from Shin et al. [3],
+			Figure 3, CC BY 4.0.
+		</figcaption>
+	</figure>
+
+	<figure class="wide-figure">
+		<img
+			src="{{ '/assets/images/humanoid-walk-reproduction.svg' | relative_url }}"
+			alt="Our Humanoid Walk learning curves comparing ABD-Net and MLP"
+		/>
+		<figcaption>
+			Our reproduction — ABD-Net and MLP.
+		</figcaption>
+	</figure>
+</div>
 
 <h3>Humanoid Walk Policy Comparison</h3>
 
