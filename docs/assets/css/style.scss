@@ -683,3 +683,37 @@ figcaption {
     padding: 3.5rem 0 2.5rem;
   }
 }
+
+.results-graph-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  width: min(1400px, 96vw);
+  margin: 2rem 50%;
+  transform: translateX(-50%);
+}
+
+.results-graph-grid figure {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.results-graph-grid img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.results-graph-grid figcaption {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 800px) {
+  .results-graph-grid {
+    grid-template-columns: 1fr;
+    width: 100%;
+    margin: 2rem 0;
+    transform: none;
+  }
+}
