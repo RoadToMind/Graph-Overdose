@@ -71,6 +71,20 @@ Each link first constructs a dynamics-aware representation using its local obser
 
 Before this representation is passed to its parent, the components associated with the learned motion basis $W$ are attenuated. The parent then aggregates the incoming contributions to form its own link representation [3](#ref-3).
 
+The bottom-up update is:
+
+$$
+v_i=\operatorname{softplus}(z_i+B_i)+\sum_{j\in CH(i)}v_j^a
+$$
+
+$$
+v_j^a=v_j-v_j\odot(W_jW_j^\top v_j)
+$$
+
+- **$B_i$** → learned inertia-like base feature
+- **$W_j$** → learned motion basis
+- **$v_j^a$** → filtered contribution sent from child to parent
+
 ### Action Decoding
 
 Each joint action is predicted from its parent link representation. The parent representation is useful because it has already incorporated the filtered contribution of the child and its subtree, giving the decoder a more complete representation of the dynamics surrounding that joint [3](#ref-3).
