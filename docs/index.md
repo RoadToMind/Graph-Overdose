@@ -67,9 +67,9 @@ For each link, the corresponding observation is transformed into an observation 
 
 ### Dynamics-Informed Message Passing
 
-Each link first constructs a dynamics-aware representation using its local observation embedding, its learned inertia-like base feature $B$, and the messages received from its descendants.
+Each link first constructs a dynamics-aware representation using its local observation embedding, its learned inertia-like base feature $$B_i$$, and the messages received from its descendants.
 
-Before this representation is passed to its parent, the components associated with the learned motion basis $W$ are attenuated. The parent then aggregates the incoming contributions to form its own link representation [3](#ref-3).
+Before this representation is passed to its parent, the components associated with the learned motion basis $$W_j$$ are attenuated. The parent then aggregates the incoming contributions to form its own link representation [3](#ref-3).
 
 The bottom-up update is:
 
@@ -81,9 +81,9 @@ $$
 v_j^a=v_j-v_j\odot(W_jW_j^\top v_j)
 $$
 
-- **$B_i$** → learned inertia-like base feature
-- **$W_j$** → learned motion basis
-- **$v_j^a$** → filtered contribution sent from child to parent
+- $$B_i$$ → learned inertia-like base feature
+- $$W_j$$ → learned motion basis
+- $$v_j^a$$ → filtered contribution sent from child to parent
 
 ### Action Decoding
 
