@@ -254,7 +254,31 @@ This is sufficient for an initial implementation because each node encoder alrea
 
 ## Results
 
-<!-- NormalDiff / AllComb / GraphOnly comparison graphs go here -->
+<div class="environment-grid">
+	<figure class="environment-card">
+		<img
+			src="{{ '/assets/images/rollball-results.svg' | relative_url }}"
+			alt="RollBall evaluation results"
+		/>
+		<figcaption>RollBall</figcaption>
+	</figure>
+
+	<figure class="environment-card">
+		<img
+			src="{{ '/assets/images/pusht-results.svg' | relative_url }}"
+			alt="PushT evaluation results"
+		/>
+		<figcaption>PushT</figcaption>
+	</figure>
+
+	<figure class="environment-card">
+		<img
+			src="{{ '/assets/images/liftpeg-results.svg' | relative_url }}"
+			alt="LiftPegUpright evaluation results"
+		/>
+		<figcaption>LiftPegUpright</figcaption>
+	</figure>
+</div>
 
 ### Evaluation
 
