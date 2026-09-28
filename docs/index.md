@@ -271,7 +271,7 @@ The implementation was similarly evaluated on tasks such as the humanoid and hop
 <div class="experiment-grid">
     <figure class="wide-figure">
 	    <img
-					src="https://arxiv.org/html/2603.19078v2/figures/main_results.jpg"
+					src="{{ '/assets/images/hopper-hop-paper-figure3.svg' | relative_url }}"
 		    alt="Hopper Hop learning curves from Figure 3 of the original ABD-NET paper"
 	    />
 	    <figcaption>

@@ -8,6 +8,6 @@
   <desc id="desc">Exact Hopper Hop subplot cropped from Figure 3 of the ABD-Net paper on arXiv.</desc>
   <image x="0" y="0" width="1000" height="285"
          preserveAspectRatio="none"
-         href="https://arxiv.org/html/2603.19078v2/figures/main_results.jpg"
-         xlink:href="https://arxiv.org/html/2603.19078v2/figures/main_results.jpg" />
+         href="hopper-hop-paper-figure3.png"
+         xlink:href="hopper-hop-paper-figure3.png" />
 </svg>
