@@ -196,7 +196,7 @@ W_i^\top \operatorname{diag}(v_i)W_i-I
 $$
 
 <p>
-This encourages the learned motion bases to satisfy the approximation used in the dynamics-informed projection [3](#ref-3).
+This encourages the learned motion bases to satisfy the approximation used in the dynamics-informed projection <a href="#ref-3">[3]</a>.
 </p>
 
 $$
@@ -471,7 +471,7 @@ The experiments did not show a consistent performance advantage from transferrin
 
 For example, the connection between the object node and the root is currently treated in the same way as the other connections in the graph, even though this is not really the same type of relationship as a joint between two robot links.
 
-There are several graph formulations that could explore this distinction more explicitly.
+There are several graph formulations that could explore this distinction more explicitly like Relational Graph Convolutional Network or even give different priorities to different edges using Graph Attention Network
 
 Another direction would be to avoid adding the object directly to the robot graph and instead use a **scene graph**, where the robot exists as one structured component and the object as another, with a separate relation describing how the two interact.
 
