@@ -270,10 +270,12 @@ The implementation was similarly evaluated on tasks such as the humanoid and hop
 
 <div class="experiment-grid">
     <figure class="wide-figure">
-	    <img
-			src="{{ '/assets/images/hopper-hop-paper-figure3.png' | relative_url }}"
-		    alt="Hopper Hop learning curves from Figure 3 of the original ABD-NET paper"
-	    />
+		<div class="hopper-paper-crop">
+			<img
+				src="{{ '/assets/images/hopper-hop-paper-figure3.png' | relative_url }}"
+				alt="Hopper Hop learning curves from Figure 3 of the original ABD-NET paper"
+			/>
+		</div>
 	    <figcaption>
 		    Original paper — Hopper Hop. Adapted from Shin et al. [3],
 		    Figure 3, CC BY 4.0.

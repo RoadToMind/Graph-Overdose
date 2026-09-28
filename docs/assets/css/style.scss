@@ -709,6 +709,24 @@ figcaption {
   margin-top: 0.5rem;
 }
 
+.hopper-paper-crop {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 205 / 143;
+  overflow: hidden;
+}
+
+.hopper-paper-crop img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 487.805%;
+  max-width: none;
+  height: auto;
+  transform: translate(-59.5%, -49.825%);
+  transform-origin: top left;
+}
+
 @media (max-width: 800px) {
   .results-graph-grid {
     grid-template-columns: 1fr;
