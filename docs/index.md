@@ -323,7 +323,7 @@ The implementation was similarly evaluated on tasks such as the humanoid and hop
 
 ### What the experiments showed
 
-The reproduction shows that both ABD-NET and the MLP baseline steadily improve throughout training and eventually reach similar returns. In contrast to the separation shown in the original paper, the two curves remain relatively close throughout much of my experiment.
+The reproduction shows that both ABD-NET and the MLP baseline steadily improve throughout training and eventually reach similar returns. In contrast to the separation shown in the original paper, the two curves remain relatively close throughout much of my experiment, but in the Hopper hop experiment the separation is larger this could be due to the fact that such a simple graph structure (as created by the Hopper) and task made adding  such dynamics inspired priors not that meaningfull.
 
 The evaluation rollouts confirm that both policies do in fact learn behaviors capable of obtaining high task returns. However, due to the lack of additional gait-related objectives and ManiSkill's relatively basic reward function, the resulting motion does not resemble a conventional human walk. One noticeable difference between the two videos is that the hip of the ABD-NET robot appears more stable than that of the MLP policy. This may be related to the additional dynamics-informed structural prior, although this observation is qualitative and was not explicitly measured.
 
