@@ -28,21 +28,38 @@ transfers to imitation learning and manipulation.
 
 ## Introduction
 
-GNNs (Graph Neural Networks) use the same deep learning techniques, but apply them to graph-structured data [1](#ref-1), [2](#ref-2). Using graphs as the main structure, one can still arrive at many popular architectures, such as convolutional and attentional architectures.
+Modern robot learning increasingly relies on neural networks to learn control policies from interaction data or demonstrations. However, the choice of architecture determines what structure the network is encouraged to exploit. While a standard MLP treats the robot state largely as a flat vector, an articulated robot already has a natural structure defined by its links and joints. Graph Neural Networks (GNNs) provide a natural way of incorporating this structure directly into the policy.
+
+Graph Neural Networks (GNNs) apply deep-learning techniques to graph-structured data [1](#ref-1), [2](#ref-2). Using graphs as the main structure, one can still arrive at many popular architectures, such as convolutional and attentional architectures.
+
+This structured representation becomes particularly interesting in robotics because the physical structure of a robot is itself naturally graph-like.
 
 This is not to say that there are no differences; one of the main properties required is the use of permutation-invariant functions for learning representations of unordered sets [1](#ref-1). Graph neural networks can be used in many areas, such as scene representation, molecules/materials, social networks, and robot kinematics and dynamics, which will be discussed further here.
 
 In robotics, GNNs can be used to build the main structural outline of a robot, including its joints, links, and the type of information that can be transmitted through the graph. A graph consists of nodes and edges: the objects being represented and the connections through which information flows between them.
 
+A graph provides a direct representation of this articulated structure. Robot links can be represented as nodes, while joints form edges connecting them. For example, in a Franka robot, the base and subsequent arm links form a connected chain through the robot's joints. This preserves which parts of the robot are physically connected and allows information to propagate through this structure rather than immediately mixing all joint information into a single flat representation.
+
 The deep learning component depends on what exactly we are trying to learn. There are node-level tasks, which predict properties of individual nodes; edge-level tasks, which reason about connections between nodes; and graph-level tasks, which predict properties of the graph as a whole. GNNs therefore commonly follow a graph-in, graph-out architecture, where node, edge, and global embeddings are progressively transformed while preserving the connectivity of the graph [1](#ref-1).
 
 This is particularly useful in robotics because a normal MLP largely treats the robot state as one flat vector. A robot, however, is not naturally a flat vector. It is an articulated structure consisting of links, joints, parent-child relationships, forces, and motion propagating throughout the system.
+
+The question is therefore not only whether a robot can be represented as a graph, but also what information should propagate through that graph and how. Standard message passing allows connected components to exchange information, while ABD-Net goes further by structuring this information flow according to articulated-body dynamics.
 
 One class of GNNs is the message-passing GNN, where each node looks at its neighbors, combines the information it receives from them, and uses that information to update its own representation. Repeating this process allows information to travel through the entire structure [1](#ref-1), [2](#ref-2).
 
 ### The main paper: ABD-Net
 
 Existing robotic GNN policies already exploit kinematic structures such as link connectivity, providing a framework that can represent the structure of different robots. However, kinematic connectivity alone does not describe how the robot actually behaves dynamically. The propagation of forces and motion through the robot was still relatively underexplored.
+
+Previous robot-learning architectures have already used structural information in different ways. Standard GNN policies use the robot's link and joint connectivity for message passing, while approaches such as BoT and SWAT incorporate robot structure into attention-based architectures. Other approaches incorporate kinematic computation directly into the network. ABD-Net differs by incorporating the computational structure of forward dynamics, using a directed bottom-up information flow inspired by the Articulated Body Algorithm [3](#ref-3). The important distinction is therefore not simply that ABD-Net represents the robot as a graph, but that it gives the information passing through that graph a dynamics-inspired structure.
+
+| Method | Structural information | Main idea |
+| --- | --- | --- |
+| MLP | None | Flat robot-state representation |
+| Standard GNN | Link/joint connectivity | Neighbor message passing |
+| BoT / SWAT | Robot structure + attention | Structure-aware attention |
+| ABD-Net | Forward-dynamics structure | Bottom-up dynamics-informed propagation |
 
 This is where the main paper, **ABD-Net** [3](#ref-3), comes into play. It asks whether introducing a forward-dynamics-inspired structure into the policy could act as an inductive bias and help the policy learn more effectively.
 
@@ -62,8 +79,37 @@ ABD-Net consists of the following main components:
 
 <h3>Observation Encoding</h3>
 <p>
-For each link, the corresponding observation is transformed into an observation embedding.
+The input to ABD-Net is the robot observation \(s\). Rather than converting the complete observation directly into one global hidden representation, ABD-Net uses a separate projection \(\phi_i\) for every robot link:
 </p>
+
+$$
+z_i = \phi_i(s)
+$$
+
+<p>
+This produces a link-specific embedding \(z_i\). Although each encoder receives information from the robot observation, each projection can learn to extract information that is particularly useful for its corresponding link.
+</p>
+
+<h3>From the Robot to the Graph</h3>
+<p>
+Before message passing can be performed, the robot is represented as a kinematic tree. Each dynamic robot link becomes a node, while joints determine the parent-child connections between nodes. One link is selected as the root, creating a hierarchy through which information can propagate from the outer links toward the root.
+</p>
+
+$$
+s
+\xrightarrow{\Phi}
+\{z_i\}
+\xrightarrow{\mathcal{M}}
+\{v_i\}
+\xrightarrow{\Psi}
+a
+$$
+
+<ul>
+<li>\(\Phi\) produces the link-specific observation embeddings.</li>
+<li>\(\mathcal{M}\) performs the dynamics-informed message passing.</li>
+<li>\(\Psi\) converts the resulting representations into joint actions.</li>
+</ul>
 
 ### Dynamics-Informed Message Passing
 
@@ -81,9 +127,27 @@ $$
 v_j^a=v_j-v_j\odot(W_jW_j^\top v_j)
 $$
 
-- $$B_i$$ → learned inertia-like base feature
-- $$W_j$$ → learned motion basis
-- $$v_j^a$$ → filtered contribution sent from child to parent
+Two important learned parameters are introduced during the dynamics-informed message passing.
+
+$$B_i$$ can be thought of as a learned baseline dynamic feature for link \(i\). It plays a role analogous to the rigid-body inertia of a link, although it should not be interpreted as the actual physical inertia.
+
+$$W_i$$ is a learned motion basis. It determines which directions in the latent representation should be attenuated before the contribution of a child link is passed to its parent, analogous to the role of the joint motion subspace in articulated-body dynamics.
+
+ABD-Net therefore does not directly insert the robot's true physical parameters. Instead, it preserves the computational structure of rigid-body dynamics while allowing the corresponding latent quantities to be learned for the control task.
+
+where:
+
+- \(i\): current link
+- \(j\): child link of \(i\)
+- \(CH(i)\): children of link \(i\)
+- \(z_i\): observation embedding
+- \(v_i\): dynamics-aware link representation
+- \(v_j^a\): filtered contribution passed from child \(j\)
+- \(B_i\): learned inertia-like base feature
+- \(W_j\): learned motion basis
+- \(\odot\): element-wise multiplication
+
+The softplus operation keeps the representation positive while remaining differentiable, loosely reflecting the positivity properties associated with physical inertia.
 
 ### Action Decoding
 
@@ -94,6 +158,32 @@ Each joint action is predicted from its parent link representation. The parent r
 The orthogonality loss encourages the parameter (W) for each link to behave like
 a proper motion basis, helping the approximation used in the message-passing equation
 remain reasonable <a href="#ref-3">[3]</a>.
+</p>
+
+$$
+\mathcal{L}_{\text{orth}}
+=
+\frac{1}{K}
+\sum_i
+\left\|
+W_i^\top \operatorname{diag}(v_i)W_i-I
+\right\|_F^2
+$$
+
+<p>
+This encourages the learned motion bases to satisfy the approximation used in the dynamics-informed projection [3](#ref-3).
+</p>
+
+$$
+\mathcal{L}_{\text{total}}
+=
+\mathcal{L}_{\text{PPO}}
++
+\lambda_{\text{orth}}\mathcal{L}_{\text{orth}}
+$$
+
+<p>
+The orthogonality term therefore does not replace the normal PPO objective but instead acts as an additional structural regularizer on the learned ABD representation.
 </p>
 
 ### PPO
@@ -122,6 +212,10 @@ There will therefore inevitably be some discrepancies between the implementation
 For the experiments, I used SAPIEN [5](#ref-5), ManiSkill3 [6](#ref-6), and its PPO training setup, following the general setup used in the original paper.
 
 The implementation was similarly evaluated on tasks such as the humanoid and hopper environments [3](#ref-3).
+
+**Humanoid Walk** controls a highly articulated body with many coupled joints.
+
+**Hopper** has a much simpler morphology, but successful hopping still requires coordination across the body's articulated chain while maintaining balance. It therefore provides a useful contrast to the more complex Humanoid morphology. Both of these tests are also being done in ABD-Net, and thus provide a useful comparison with the original work.
 
 <h3>Humanoid Walk Learning Curves</h3>
 
@@ -178,11 +272,23 @@ The implementation was similarly evaluated on tasks such as the humanoid and hop
 
 ### What the experiments showed
 
-A useful inductive bias does not necessarily increase the expressive power of the policy. Instead, it restricts or structures the search space so that the policy is encouraged, in this case, toward more physically meaningful representations.
+The reproduction shows that both ABD-Net and the MLP baseline steadily improve throughout training and eventually reach similar returns. In contrast to the separation shown in the original paper, the two curves remain relatively close throughout much of my experiment.
 
-An interesting aspect, also explored in the original paper, is that the SAPIEN experiments use ManiSkill's default reward functions without the additional gait-related terms used in some of the Genesis locomotion environments [3](#ref-3).
+The evaluation rollouts confirm that both policies do in fact learn behaviors capable of obtaining high task returns. However, due to the lack of additional gait-related objectives and ManiSkill's relatively basic reward function, the resulting motion does not resemble a conventional human walk. One noticeable difference between the two videos is that the hip of the ABD-Net robot appears more stable than that of the MLP policy. This may be related to the additional dynamics-informed structural prior, although this observation is qualitative and was not explicitly measured.
 
-Under the limited tasks and seeds I tested, the structural prior did not produce a clear gain in either sample efficiency or final return, while introducing additional computational overhead.
+In my reproduction, ABD-Net and the MLP baseline follow very similar learning trajectories on Humanoid Walk. Neither model shows a consistent separation throughout training, and both eventually achieve comparable evaluation returns.
+
+Under this implementation and the limited number of seeds tested, the dynamics-informed architectural prior therefore did not result in a clear improvement in either sample efficiency or final return.
+
+### Interpretation
+
+This does not necessarily mean that the inductive bias contains no useful information. Its usefulness may depend strongly on the environment, morphology, reward formulation, and whether solving the task actually requires the additional structural information provided by the graph.
+
+A useful inductive bias does not necessarily increase the expressive power of the policy. Instead, ABD-Net structures the policy toward representations organized according to the computational pattern of articulated-body dynamics.
+
+The somewhat unnatural walking behavior should also be interpreted in the context of the reward function. The policy is optimized to maximize the environment return rather than explicitly produce a human-like gait.
+
+The SAPIEN experiments use ManiSkill's default reward formulation without several of the additional gait-related objectives used in some of the Genesis locomotion environments [3](#ref-3). As a result, a mechanically unusual motion can still be considered successful as long as it satisfies the task objective and receives a high return.
 
 It should also be noted that this implementation did not use the JAX implementation used for some of the experiments in the original work.
 
@@ -196,6 +302,8 @@ This raises a broader question: **what happens when the idea is taken beyond the
 This direction connects to previous work that bridges learned expert policies with imitation learning or incorporates graph- and kinematics-based structural priors into imitation-learning policies [7](#ref-7)-[9](#ref-9).
 
 Tasks such as picking, pulling, and manipulation more generally could potentially benefit from such a physics-inspired prior. Manipulation itself is also mentioned as one of the future directions in the original ABD-Net paper [3](#ref-3).
+
+Consider the same end-effector position being reached using two different Franka arm configurations. Although the gripper may be at nearly the same pose, the shoulder and elbow configurations—and therefore the feasible motion directions and response to an action—can be considerably different. A graph representation preserves the articulated chain that produced this configuration rather than treating the individual joint states as unrelated components of a flat observation.
 
 ### Transferring ABD-Net to Diffusion Policy
 
@@ -239,6 +347,22 @@ These three experiments are compared using the normal Diffusion Policy
 with the original observation (<strong>AllComb</strong>), and the policy where
 the graph representation provides the main structural conditioning
 (<strong>GraphOnly</strong>).
+</p>
+
+<p>
+For example:
+</p>
+
+<p>
+<strong>NormalDiff:</strong> uses the original state observation supplied by the ManiSkill Diffusion Policy environment.
+</p>
+
+<p>
+<strong>AllComb:</strong> preserves that complete observation and augments it with the selected ABD embedding.
+</p>
+
+<p>
+<strong>GraphOnly:</strong> removes/reduces the direct dependence on the flat robot observation and instead conditions the policy primarily on the graph-derived representation; task-object information must therefore also be represented in the graph.
 </p>
 
 <p>
@@ -287,6 +411,16 @@ This is sufficient for an initial implementation because each node encoder alrea
     <figcaption>LiftPegUpright</figcaption>
   </figure>
 </div>
+
+### What the plots show
+
+**RollBall:** NormalDiff and AllComb begin improving earlier than GraphOnly and maintain stronger performance through most of training. GraphOnly improves considerably more slowly.
+
+**PushT:** All three methods achieve comparatively low and noisy success rates. NormalDiff reaches the strongest performance toward the end of training, while AllComb improves later and GraphOnly remains lower.
+
+**LiftPegUpright:** NormalDiff begins learning substantially earlier. AllComb initially lags behind but improves later in training, while GraphOnly again shows slower and weaker learning.
+
+Taken together, the experiments show a consistent trend: the original Diffusion Policy performs best overall, adding the ABD representation does not provide a clear advantage, and relying primarily on the graph representation makes learning considerably more difficult.
 
 ### Evaluation
 
