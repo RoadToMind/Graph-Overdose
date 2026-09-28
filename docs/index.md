@@ -46,7 +46,7 @@ One class of GNNs is the message-passing GNN, where each node looks at its neigh
 
 The question is therefore not only whether a robot can be represented as a graph, but also what information should propagate through that graph and how. Standard message passing allows connected components to exchange information, while ABD-NET goes further by structuring this information flow according to articulated-body dynamics.
 
-### the Main Paper: ABD-NET
+### The Main Paper: ABD-NET
 
 Existing robotic GNN policies already exploit kinematic structures such as link connectivity, providing a framework that can represent the structure of different robots. However, kinematic connectivity alone does not describe how the robot actually behaves dynamically. The propagation of forces and motion through the robot was still relatively underexplored.
 
