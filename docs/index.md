@@ -54,12 +54,39 @@ Existing robotic GNN policies already exploit kinematic structures such as link 
 
 Previous robot-learning architectures have already used structural information in different ways. Standard GNN policies use the robot's link and joint connectivity for message passing, while approaches such as BoT and SWAT incorporate robot structure into attention-based architectures. Other approaches incorporate kinematic computation directly into the network. ABD-Net differs by incorporating the computational structure of forward dynamics, using a directed bottom-up information flow inspired by the Articulated Body Algorithm [3](#ref-3). The important distinction is therefore not simply that ABD-Net represents the robot as a graph, but that it gives the information passing through that graph a dynamics-inspired structure.
 
-| Method | Structural information | Main idea |
-| --- | --- | --- |
-| MLP | None | Flat robot-state representation |
-| Standard GNN | Link/joint connectivity | Neighbor message passing |
-| BoT / SWAT | Robot structure + attention | Structure-aware attention |
-| ABD-Net | Forward-dynamics structure | Bottom-up dynamics-informed propagation |
+<div class="decision-table-wrapper">
+<table class="decision-table">
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Structural information</th>
+      <th>Main idea</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MLP</td>
+      <td>None</td>
+      <td>Flat robot-state representation</td>
+    </tr>
+    <tr>
+      <td>Standard GNN</td>
+      <td>Link/joint connectivity</td>
+      <td>Neighbor message passing</td>
+    </tr>
+    <tr>
+      <td>BoT / SWAT</td>
+      <td>Robot structure + attention</td>
+      <td>Structure-aware attention</td>
+    </tr>
+    <tr>
+      <td>ABD-Net</td>
+      <td>Forward-dynamics structure</td>
+      <td>Bottom-up dynamics-informed propagation</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 This is where the main paper, **ABD-Net** [3](#ref-3), comes into play. It asks whether introducing a forward-dynamics-inspired structure into the policy could act as an inductive bias and help the policy learn more effectively.
 
