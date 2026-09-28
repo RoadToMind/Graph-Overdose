@@ -266,6 +266,31 @@ The implementation was similarly evaluated on tasks such as the humanoid and hop
 	</figure>
 </div>
 
+<h3>Hopper Hop Learning Curves</h3>
+
+<div class="experiment-grid">
+    <figure class="wide-figure">
+	    <img
+		    src="{{ '/assets/images/hopper-hop-paper-figure3.svg' | relative_url }}"
+		    alt="Hopper Hop learning curves from Figure 3 of the original ABD-NET paper"
+	    />
+	    <figcaption>
+		    Original paper — Hopper Hop. Adapted from Shin et al. [3],
+		    Figure 3, CC BY 4.0.
+	    </figcaption>
+    </figure>
+
+    <figure class="wide-figure">
+	    <img
+		    src="{{ '/assets/images/HopperHopDiagram.svg' | relative_url }}"
+		    alt="Our Hopper Hop learning curves from the ABD-NET reproduction"
+	    />
+	    <figcaption>
+		    Our reproduction — ABD-NET Hopper Hop.
+	    </figcaption>
+    </figure>
+</div>
+
 <h3>Humanoid Walk Policy Comparison</h3>
 
 <div class="experiment-grid">
