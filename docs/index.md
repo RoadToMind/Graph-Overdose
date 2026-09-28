@@ -42,11 +42,9 @@ A graph provides a direct representation of this articulated structure. Robot li
 
 The deep learning component depends on what exactly we are trying to learn. There are node-level tasks, which predict properties of individual nodes; edge-level tasks, which reason about connections between nodes; and graph-level tasks, which predict properties of the graph as a whole. GNNs therefore commonly follow a graph-in, graph-out architecture, where node, edge, and global embeddings are progressively transformed while preserving the connectivity of the graph [1](#ref-1).
 
-This is particularly useful in robotics because a normal MLP largely treats the robot state as one flat vector. A robot, however, is not naturally a flat vector. It is an articulated structure consisting of links, joints, parent-child relationships, forces, and motion propagating throughout the system.
+One class of GNNs is the message-passing GNN, where each node looks at its neighbors, combines the information it receives from them, and uses that information to update its own representation. Repeating this process allows information to travel through the entire structure [1](#ref-1), [2](#ref-2).
 
 The question is therefore not only whether a robot can be represented as a graph, but also what information should propagate through that graph and how. Standard message passing allows connected components to exchange information, while ABD-Net goes further by structuring this information flow according to articulated-body dynamics.
-
-One class of GNNs is the message-passing GNN, where each node looks at its neighbors, combines the information it receives from them, and uses that information to update its own representation. Repeating this process allows information to travel through the entire structure [1](#ref-1), [2](#ref-2).
 
 ### The main paper: ABD-Net
 
